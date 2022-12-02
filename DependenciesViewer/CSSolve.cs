@@ -1,9 +1,11 @@
 ﻿using Microsoft.Msagl.Core.ProjectionSolver;
 using Microsoft.Msagl.Drawing;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace DependenciesViewer
 {
@@ -41,8 +43,8 @@ namespace DependenciesViewer
             var lastNamespace = Namespace.global;
             foreach (var line in lines)
             {
-                
-                var trimmed = line.TrimStart().Replace("partial", "");
+
+                var trimmed = line.TrimStart();
 
                 if (trimmed.StartsWith("namespace"))
                 {
@@ -50,36 +52,49 @@ namespace DependenciesViewer
                     continue;
                 }
 
-                if (trimmed.StartsWith("public class") ||
-                    trimmed.StartsWith("private class") ||
-                    trimmed.StartsWith("internal class") ||
-                    trimmed.StartsWith("class"))
-                {
-                    var protection = Class.Protection.@private;
-                    if (trimmed.StartsWith("public"))
-                        protection = Class.Protection.@public;
-                    if (trimmed.StartsWith("internal"))
-                        protection = Class.Protection.@internal;
+                var ((name, Extends, protection), error) = ParseClass(trimmed);
 
-                    var splitted = trimmed.Replace(":", " : ").Split(' ').ToList();
-                    var classIndex = splitted.FindIndex(x => x.Equals("class"));
-                    var deviderIndex = splitted.FindIndex(x => x.Equals(":"));
-                    var whereIndex = splitted.FindIndex(x => x.Equals("where"));
-                    if (deviderIndex == -1)
-                        lastNamespace.AddClass(splitted[classIndex + 1], new string[0], protection);
-                    else
-                    {
-                        lastNamespace.AddClass(
-                            splitted[classIndex + 1], 
-                            splitted
-                            .Skip(deviderIndex + 1).Take(whereIndex - deviderIndex)
-                            .Select(x => x.TrimEnd(' ', ','))
-                            .Where(x => !string.IsNullOrWhiteSpace(x.Trim()))
-                            .ToArray(),
-                            protection);
-                    }
-                }
+                if (!error)
+                    lastNamespace.AddClass(name, Extends, protection);
             }
+        }
+        ((string name, string[] Extends, Class.Protection protection), bool error) ParseClass(string trimmed)
+        {
+            if (!trimmed.StartsWith("public class")   &&
+                !trimmed.StartsWith("private class")  &&
+                !trimmed.StartsWith("internal class") &&
+                !trimmed.StartsWith("class"))
+            {
+                return (default, true);
+            }
+            trimmed = trimmed.Replace("partial", "");
+
+            var protection = Class.Protection.@private;
+            if (trimmed.StartsWith("public"))
+                protection = Class.Protection.@public;
+            if (trimmed.StartsWith("internal"))
+                protection = Class.Protection.@internal;
+
+            var splitted = trimmed
+                .Replace(":", " : ")
+                .Split(' ')
+                .Where(x => !string.IsNullOrEmpty(x.Trim()))
+                .ToList();
+            var classIndex = splitted.FindIndex(x => x.Equals("class"));
+            var delimiterIndex = splitted.FindIndex(x => x.Equals(":"));
+            var whereIndex = splitted.FindIndex(x => x.Equals("where"));
+
+            string[] extends = new string[0];
+
+            if (delimiterIndex != -1)
+            {
+                var endIndex = Math.Max(whereIndex, splitted.Count - 1);
+                extends = new string[endIndex - delimiterIndex];
+                Array.Copy(splitted.ToArray(), delimiterIndex + 1, extends, 0, extends.Length);
+                extends = extends.Where(x => !(x.Equals("new()") || x.Equals("new ()"))).ToArray();
+            }
+
+            return ((splitted[classIndex + 1], extends, protection), false);
         }
         Namespace AddNamespace(string name)
         {
@@ -139,3 +154,8 @@ namespace DependenciesViewer
         }
     }
 }
+public class A { }
+public class B : C { }
+public class C : D{ }
+public class D : A { }
+public class E : C { }

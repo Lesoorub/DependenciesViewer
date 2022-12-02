@@ -33,40 +33,35 @@ namespace DependenciesViewer
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
-            var fi = new FileInfo(openFileDialog1.FileName);
-            if (!fi.Exists)
-            {
-                MessageBox.Show("Файл не найден");
-                return;
-            }
-
-            Properties.Settings.Default.LastSelectedDirectory = fi.DirectoryName;
-            Properties.Settings.Default.Save();
-
-            DependenciesGraph.CurrentLayoutMethod = Microsoft.Msagl.GraphViewerGdi.LayoutMethod.MDS;
-
-            if (fi.Extension == ".sln")
-            {
-                var sln = new CSProjectSLN(fi.FullName);
-
-                DependenciesGraph.Graph = sln.GenerateGraph();
-
-            } 
-            else if (fi.Extension == ".csproj")
-            {
-                var csproj = new CSSolve(fi.Name, fi.FullName);
-
-                DependenciesGraph.Graph = csproj.GenerateGraph();
-            }
-            else
-            {
-                MessageBox.Show("Неверный формат файла! Ожидался .sln или .csproj");
-                return;
-            }
-
-            Focus();
             try
             {
+                var fi = new FileInfo(openFileDialog1.FileName);
+                if (!fi.Exists)
+                {
+                    MessageBox.Show("Файл не найден");
+                    return;
+                }
+
+                Properties.Settings.Default.LastSelectedDirectory = fi.DirectoryName;
+                Properties.Settings.Default.Save();
+
+                if (fi.Extension == ".sln")
+                {
+                    var sln = new CSProjectSLN(fi.FullName);
+                    DependenciesGraph.Graph = sln.GenerateGraph();
+                }
+                else if (fi.Extension == ".csproj")
+                {
+                    var csproj = new CSSolve(fi.Name, fi.FullName);
+                    DependenciesGraph.Graph = csproj.GenerateGraph();
+                }
+                else
+                {
+                    MessageBox.Show("Неверный формат файла! Ожидался .sln или .csproj");
+                    return;
+                }
+
+                Focus();
             }
             catch
 #if DEBUG
@@ -79,6 +74,11 @@ namespace DependenciesViewer
                 MessageBox.Show("Неизвестная ошибка");
 #endif
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
         }
     }
 }
