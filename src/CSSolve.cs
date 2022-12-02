@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace DependenciesViewer
 {
-    public class CSSolve
+    public class CSSolve : IHasGraph
     {
         public string name;
         public string path;
@@ -154,8 +154,3 @@ namespace DependenciesViewer
         }
     }
 }
-public class A { }
-public class B : C { }
-public class C : D{ }
-public class D : A { }
-public class E : C { }

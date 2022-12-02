@@ -32,6 +32,7 @@
             this.DependenciesGraph = new Microsoft.Msagl.GraphViewerGdi.GViewer();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.button1 = new System.Windows.Forms.Button();
+            this.layoutMethod = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // DependenciesGraph
@@ -44,7 +45,7 @@
             this.DependenciesGraph.AutoScroll = true;
             this.DependenciesGraph.BackwardEnabled = false;
             this.DependenciesGraph.BuildHitTree = true;
-            this.DependenciesGraph.CurrentLayoutMethod = Microsoft.Msagl.GraphViewerGdi.LayoutMethod.MDS;
+            this.DependenciesGraph.CurrentLayoutMethod = Microsoft.Msagl.GraphViewerGdi.LayoutMethod.Ranking;
             this.DependenciesGraph.EdgeInsertButtonVisible = true;
             this.DependenciesGraph.FileName = "";
             this.DependenciesGraph.ForwardEnabled = false;
@@ -91,11 +92,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // layoutMethod
+            // 
+            this.layoutMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.layoutMethod.FormattingEnabled = true;
+            this.layoutMethod.Location = new System.Drawing.Point(94, 13);
+            this.layoutMethod.Name = "layoutMethod";
+            this.layoutMethod.Size = new System.Drawing.Size(206, 21);
+            this.layoutMethod.TabIndex = 2;
+            this.layoutMethod.SelectedIndexChanged += new System.EventHandler(this.layoutMethod_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.layoutMethod);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.DependenciesGraph);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -111,6 +123,7 @@
         private Microsoft.Msagl.GraphViewerGdi.GViewer DependenciesGraph;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ComboBox layoutMethod;
     }
 }
 

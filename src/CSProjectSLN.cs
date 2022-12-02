@@ -9,7 +9,7 @@ using Microsoft.Msagl.Core.ProjectionSolver;
 
 namespace DependenciesViewer
 {
-    public class CSProjectSLN
+    public class CSProjectSLN : IHasGraph
     {
         public List<CSSolve> Solves = new List<CSSolve>();
 

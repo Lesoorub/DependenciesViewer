@@ -26,12 +26,24 @@ namespace DependenciesViewer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LastSelectedDirectory {
+        public string LastDirectory {
             get {
-                return ((string)(this["LastSelectedDirectory"]));
+                return ((string)(this["LastDirectory"]));
             }
             set {
-                this["LastSelectedDirectory"] = value;
+                this["LastDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int LayoutMethodIndex {
+            get {
+                return ((int)(this["LayoutMethodIndex"]));
+            }
+            set {
+                this["LayoutMethodIndex"] = value;
             }
         }
     }

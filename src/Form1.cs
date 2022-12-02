@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Msagl.GraphViewerGdi;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,6 +14,7 @@ namespace DependenciesViewer
 {
     public partial class Form1 : Form
     {
+        IHasGraph lastGraph;
         public Form1()
         {
             InitializeComponent();
@@ -20,15 +22,13 @@ namespace DependenciesViewer
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.LastSelectedDirectory))
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.LastDirectory))
             {
-                openFileDialog1.InitialDirectory = Properties.Settings.Default.LastSelectedDirectory;
+                openFileDialog1.InitialDirectory = Properties.Settings.Default.LastDirectory;
             }
-            if (openFileDialog1.ShowDialog() != DialogResult.OK)
-            {
-                Close();
-                return;
-            }
+            layoutMethod.Items.Clear();
+            layoutMethod.Items.AddRange(Enum.GetNames(typeof(LayoutMethod)));
+            layoutMethod.SelectedIndex = Math.Min(0, Math.Min(layoutMethod.Items.Count - 1, Properties.Settings.Default.LayoutMethodIndex));
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -42,24 +42,23 @@ namespace DependenciesViewer
                     return;
                 }
 
-                Properties.Settings.Default.LastSelectedDirectory = fi.DirectoryName;
+                Properties.Settings.Default.LastDirectory = fi.DirectoryName;
                 Properties.Settings.Default.Save();
 
                 if (fi.Extension == ".sln")
                 {
-                    var sln = new CSProjectSLN(fi.FullName);
-                    DependenciesGraph.Graph = sln.GenerateGraph();
+                    lastGraph = new CSProjectSLN(fi.FullName);
                 }
                 else if (fi.Extension == ".csproj")
                 {
-                    var csproj = new CSSolve(fi.Name, fi.FullName);
-                    DependenciesGraph.Graph = csproj.GenerateGraph();
+                    lastGraph = new CSSolve(fi.Name, fi.FullName); 
                 }
                 else
                 {
                     MessageBox.Show("Неверный формат файла! Ожидался .sln или .csproj");
                     return;
                 }
+                ReDrawGraph();
 
                 Focus();
             }
@@ -79,6 +78,26 @@ namespace DependenciesViewer
         private void button1_Click(object sender, EventArgs e)
         {
             openFileDialog1.ShowDialog();
+        }
+
+        private void layoutMethod_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            DependenciesGraph.CurrentLayoutMethod = (LayoutMethod)layoutMethod.SelectedIndex;
+            Properties.Settings.Default.LayoutMethodIndex = layoutMethod.SelectedIndex;
+            if (lastGraph != null)
+                ReDrawGraph();
+        }
+
+        void ReDrawGraph()
+        {
+            try
+            {
+                DependenciesGraph.Graph = lastGraph.GenerateGraph();
+            }
+            catch
+            {
+
+            }
         }
     }
 }
