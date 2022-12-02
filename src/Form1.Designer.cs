@@ -41,7 +41,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DependenciesGraph.ArrowheadLength = 10D;
-            this.DependenciesGraph.AsyncLayout = false;
+            this.DependenciesGraph.AsyncLayout = true;
             this.DependenciesGraph.AutoScroll = true;
             this.DependenciesGraph.BackwardEnabled = false;
             this.DependenciesGraph.BuildHitTree = true;

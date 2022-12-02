@@ -92,6 +92,7 @@ namespace DependenciesViewer
         {
             try
             {
+                DependenciesGraph.AsyncLayout = true;
                 DependenciesGraph.Graph = lastGraph.GenerateGraph();
             }
             catch

@@ -5,6 +5,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DependenciesViewer
@@ -41,9 +42,9 @@ namespace DependenciesViewer
         {
             var lines = File.ReadAllLines(file.FullName);
             var lastNamespace = Namespace.global;
+
             foreach (var line in lines)
             {
-
                 var trimmed = line.TrimStart();
 
                 if (trimmed.StartsWith("namespace"))

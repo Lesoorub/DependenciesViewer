@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Msagl.Core.ProjectionSolver;
 using Microsoft.Msagl.Drawing;
 using static DependenciesViewer.CSSolve;
 
@@ -26,33 +28,47 @@ namespace DependenciesViewer
             }
             void AddEdge(string begin, string end)
             {
-                if (!nodes.Contains(begin))
-                    AddNode(begin);
-                if (!nodes.Contains(end))
-                    AddNode(end);
-                if (!edges.Contains((begin, end)))
+                lock (nodes)
                 {
-                    graph.AddEdge(begin, end);
-                    edges.Add((begin, end));
+                    if (!nodes.Contains(begin))
+                        AddNode(begin);
+                    if (!nodes.Contains(end))
+                        AddNode(end);
+                }
+                lock (edges)
+                {
+                    if (!edges.Contains((begin, end)))
+                    {
+                        graph.AddEdge(begin, end);
+                        edges.Add((begin, end));
+                    }
                 }
             }
             void AddEdgeWithLabel(string begin, string text, string end)
             {
-                if (!nodes.Contains(begin))
-                    AddNode(begin);
-                if (!nodes.Contains(end))
-                    AddNode(end);
-                if (!edges.Contains((begin, end)))
+                lock (nodes)
                 {
-                    graph.AddEdge(begin, text, end);
-                    edges.Add((begin, end));
+                    if (!nodes.Contains(begin))
+                        AddNode(begin);
+                    if (!nodes.Contains(end))
+                        AddNode(end);
+                }
+                lock (edges)
+                {
+                    if (!edges.Contains((begin, end)))
+                    {
+                        graph.AddEdge(begin, text, end);
+                        edges.Add((begin, end));
+                    }
                 }
             }
 
-            foreach (var solve in Solves)
+            Parallel.ForEach(Solves, (solve) =>
+            {
                 namespaces.AddRange(solve.ParseNamespaces());
+            });
 
-            foreach (var @namespace in namespaces)
+            Parallel.ForEach(namespaces, (@namespace) =>
             {
                 foreach (var @class in @namespace.Classes)
                     AddNode(@class.name);
@@ -66,7 +82,7 @@ namespace DependenciesViewer
                     if (AddLineToNamespace)
                         AddEdgeWithLabel(@class.name, LineToNamespaceText, @namespace.name);
                 }
-            }
+            });
 
             return graph;
         }
