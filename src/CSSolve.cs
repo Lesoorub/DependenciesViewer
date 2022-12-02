@@ -92,7 +92,10 @@ namespace DependenciesViewer
                 var endIndex = Math.Max(whereIndex, splitted.Count - 1);
                 extends = new string[endIndex - delimiterIndex];
                 Array.Copy(splitted.ToArray(), delimiterIndex + 1, extends, 0, extends.Length);
-                extends = extends.Where(x => !(x.Equals("new()") || x.Equals("new ()"))).ToArray();
+                extends = extends
+                    .Where(x => !(x.Equals("new()") || x.Equals("new ()")))
+                    .Select(x => x.Trim(',', ' '))
+                    .ToArray();
             }
 
             return ((splitted[classIndex + 1], extends, protection), false);
